@@ -132,13 +132,13 @@ def accueil():
 
         <div class="form-group">
             <label>Satisfaction environnement</label>
-            <div class="attendu">Attendu : int</div>
+            <div class="attendu">Attendu : int (entre 1 et 4)</div>
             <input type="number" id="satisfaction_employee_environnement" required>
         </div>
 
         <div class="form-group">
             <label>Satisfaction équipe</label>
-            <div class="attendu">Attendu : int</div>
+            <div class="attendu">Attendu : int (entre 1 et 4)</div>
             <input type="number" id="satisfaction_employee_equipe" required>
         </div>
 
