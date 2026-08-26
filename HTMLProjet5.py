@@ -1,7 +1,5 @@
 from fastapi.responses import HTMLResponse
-from GitProject5 import app
 
-@app.get("/", response_class=HTMLResponse)
 def accueil():
     return """
     <!DOCTYPE html>
