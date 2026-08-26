@@ -14,6 +14,8 @@ from typing import Literal
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from pydantic import BaseModel
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from HTMLProjet5 import accueil
 
 load_dotenv()
 URLBDD = os.getenv("URLBDD")
@@ -53,6 +55,9 @@ Scaler = joblib.load("Scaler")
 
 list_LE = [LE_genre, LE_status_martial, LE_poste, LE_heure_supplementaires, LE_domaine_etude]
 
+@app.get("/", response_class=HTMLResponse)
+def home():
+    return accueil()
 @app.post("/PredictionUser")
 def PredictionUser(features:Features):
     list_features = []
