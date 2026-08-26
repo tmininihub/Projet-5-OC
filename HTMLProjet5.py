@@ -95,7 +95,7 @@ def accueil():
 
         <div class="form-group">
             <label>Revenu mensuel</label>
-            <div class="attendu">Attendu : int</div>
+            <div class="attendu">Attendu : int (entre 2000 et 20000)</div>
             <input type="number" id="revenu_mensuel" required>
         </div>
 
@@ -150,12 +150,12 @@ def accueil():
 
         <div class="form-group">
             <label>Augmentation de salaire précédente</label>
-            <div class="attendu">Attendu : int</div>
+            <div class="attendu">Attendu : int (en %)</div>
             <input type="number" id="augementation_salaire_precedente" required>
         </div>
 
         <div class="form-group">
-            <label>Nombre de participations au PEE</label>
+            <label>Nombre de participations au PEE (Plan d'Épargne Entreprise)</label>
             <div class="attendu">Attendu : int</div>
             <input type="number" id="nombre_participation_pee" required>
         </div>
@@ -168,7 +168,7 @@ def accueil():
 
         <div class="form-group">
             <label>Distance domicile-travail</label>
-            <div class="attendu">Attendu : int</div>
+            <div class="attendu">Attendu : int (en km)</div>
             <input type="number" id="distance_domicile_travail" required>
         </div>
 
