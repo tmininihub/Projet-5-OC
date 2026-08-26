@@ -8,3 +8,6 @@ numpy
 scikit-learn
 joblib
 python-dotenv
+pytest
+httpx
+psycopg2-binary
