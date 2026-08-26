@@ -43,16 +43,6 @@ class Features(BaseModel):
     domaine_etude : Literal['Infra & Cloud', 'Autre', 'Transformation Digitale', 'Marketing', 'Entrepreunariat', 'Ressources Humaines']
     annees_depuis_la_derniere_promotion : int
 
-BDD = joblib.load("BDD")
-
-engine = create_engine(URLBDD)
-
-BDD.to_sql(
-    "MyBDD",
-    con=engine,
-    if_exists="replace",
-    index=False
-)
 
 LE_genre = joblib.load("LE_genre.pkl")
 LE_status_martial = joblib.load("LE_statut_marital.pkl")
@@ -104,6 +94,8 @@ def PredictionUser(features:Features):
     print(dico_database)
 
     df = pd.DataFrame([dico_database])
+
+    engine = create_engine(URLBDD)
 
     df.to_sql(
         "HistoryPredictions",
