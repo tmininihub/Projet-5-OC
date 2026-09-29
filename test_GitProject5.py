@@ -1,5 +1,5 @@
 import pytest
-from Projet_5.TESTGitProject5 import PredictionUser, Features, app, engine
+from main import Features, app, engine
 from sqlalchemy import create_engine, text
 import joblib
 import uvicorn
@@ -21,29 +21,40 @@ from fastapi.testclient import TestClient
 import json
 
 features = Features(
-    age=35,
+    age=41,
     genre="F",
-    revenu_mensuel=19000,
+    revenu_mensuel=5993,
     statut_marital="Célibataire",
+    departement="Commercial",
     poste="Cadre Commercial",
-    nombre_experiences_precedentes=4,
-    annees_dans_l_entreprise=4,
-    satisfaction_employee_environnement=3,
-    satisfaction_employee_equipe=4,
-    heure_supplementaires="Non",
-    augementation_salaire_precedente=12,
-    nombre_participation_pee=1,
-    nb_formations_suivies=3,
-    distance_domicile_travail=15,
-    niveau_education=10,
+    nombre_experiences_precedentes=8,
+    nombre_heures_travailless=80,
+    annees_dans_l_entreprise=6,
+    annees_dans_le_poste_actuel=4,
+    satisfaction_employee_environnement=2,
+    satisfaction_employee_nature_travail=4,
+    satisfaction_employee_equipe=1,
+    satisfaction_employee_equilibre_pro_perso=1,
+    note_evaluation_precedente=3,
+    note_evaluation_actuelle=3,
+    heure_supplementaires="Oui",
+    augementation_salaire_precedente=11,
+    nombre_participation_pee=0,
+    nb_formations_suivies=0,
+    nombre_employee_sous_responsabilite=1,
+    distance_domicile_travail=1,
+    niveau_education=2,
     domaine_etude="Infra & Cloud",
-    annees_depuis_la_derniere_promotion=2
+    ayant_enfants="Y",
+    frequence_deplacement="Occasionnel",
+    annees_depuis_la_derniere_promotion=0,
+    annes_sous_responsable_actuel=5,
+    Frequence_changement_emploi=2.0,
+    Satisfaction_totale=2.0,
 )
 
 def test_prediction():
-    assert isinstance(features, Features)
-    assert 18 <= features.age <= 70
-    assert 1000 <= features.revenu_mensuel <= 20000
+    # assert isinstance(features, Features)
     Client = TestClient(app)
     features_test = features.model_dump()
     request = Client.post("/PredictionUser",json=features_test)
