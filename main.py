@@ -21,8 +21,8 @@ from HTMLProjet5 import accueil
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
-
 load_dotenv()
+
 URLBDD = os.getenv("URLBDD")
 
 app = FastAPI()
