@@ -31,9 +31,6 @@ jobs:
       - name: Installer les dépendances
         run: pip install -r requirements.txt
 
-      - name: Créer les tables
-        run: python create_db.py
-
       - name: Lancer les tests avec couverture
         run: pytest --cov=. --cov-report=term-missing --cov-report=xml
 
