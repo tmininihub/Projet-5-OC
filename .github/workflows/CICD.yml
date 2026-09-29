@@ -2,76 +2,35 @@ name: CI-CD
 
 on:
   push:
-  pull_request:
-    branches: [main]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready --health-interval 5s
-          --health-timeout 5s --health-retries 5
+    runs-on: self-hosted
     env:
-      URLBDD: postgresql://postgres:postgres@localhost:5432/test_db
+      URLBDD: ${{ secrets.URLBDD }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
       - name: Installer les dépendances
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt
 
-      - name: Lancer les tests avec couverture
-        run: pytest --cov=. --cov-report=term-missing --cov-report=xml
-
-      - name: Sauvegarder le rapport de couverture
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage.xml
+      - name: Lancer les tests
+        run: python -m pytest
 
   deploy:
     needs: test
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready --health-interval 5s
-          --health-timeout 5s --health-retries 5
+    runs-on: self-hosted
+    timeout-minutes: 720
+    concurrency:
+      group: uvicorn
+      cancel-in-progress: true
     env:
-      URLBDD: postgresql://postgres:postgres@localhost:5432/test_db
+      URLBDD: ${{ secrets.URLBDD }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
       - name: Installer les dépendances
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt
 
-      - name: Créer les tables
-        run: python create_db.py
-
-      - name: Lancer l'API et vérifier qu'elle répond
-        run: |
-          nohup python -m uvicorn main:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
-          sleep 8
-          curl --fail http://127.0.0.1:8000/docs || (cat uvicorn.log && exit 1)
+      - name: Lancer l'API
+        run: python -m uvicorn main:app --host 127.0.0.1 --port 8000
