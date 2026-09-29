@@ -108,6 +108,14 @@ def accueil():
         </div>
 
         <div class="form-group">
+            <label>Département</label>
+            <div class="attendu">
+                Attendu : str (Commercial, Consulting, Ressources Humaines)
+            </div>
+            <input type="text" id="departement" required>
+        </div>
+
+        <div class="form-group">
             <label>Poste</label>
             <div class="attendu">
                 Attendu : str (Cadre Commercial, Assistant de Direction,
@@ -125,9 +133,21 @@ def accueil():
         </div>
 
         <div class="form-group">
+            <label>Nombre d'heures travaillées</label>
+            <div class="attendu">Attendu : int</div>
+            <input type="number" id="nombre_heures_travailless" required>
+        </div>
+
+        <div class="form-group">
             <label>Années dans l'entreprise</label>
             <div class="attendu">Attendu : int</div>
             <input type="number" id="annees_dans_l_entreprise" required>
+        </div>
+
+        <div class="form-group">
+            <label>Années dans le poste actuel</label>
+            <div class="attendu">Attendu : int</div>
+            <input type="number" id="annees_dans_le_poste_actuel" required>
         </div>
 
         <div class="form-group">
@@ -137,9 +157,33 @@ def accueil():
         </div>
 
         <div class="form-group">
+            <label>Satisfaction nature du travail</label>
+            <div class="attendu">Attendu : int (entre 1 et 4)</div>
+            <input type="number" id="satisfaction_employee_nature_travail" required>
+        </div>
+
+        <div class="form-group">
             <label>Satisfaction équipe</label>
             <div class="attendu">Attendu : int (entre 1 et 4)</div>
             <input type="number" id="satisfaction_employee_equipe" required>
+        </div>
+
+        <div class="form-group">
+            <label>Satisfaction équilibre vie professionnelle / personnelle</label>
+            <div class="attendu">Attendu : int (entre 1 et 4)</div>
+            <input type="number" id="satisfaction_employee_equilibre_pro_perso" required>
+        </div>
+
+        <div class="form-group">
+            <label>Note d'évaluation précédente</label>
+            <div class="attendu">Attendu : int</div>
+            <input type="number" id="note_evaluation_precedente" required>
+        </div>
+
+        <div class="form-group">
+            <label>Note d'évaluation actuelle</label>
+            <div class="attendu">Attendu : int</div>
+            <input type="number" id="note_evaluation_actuelle" required>
         </div>
 
         <div class="form-group">
@@ -167,6 +211,12 @@ def accueil():
         </div>
 
         <div class="form-group">
+            <label>Nombre d'employés sous responsabilité</label>
+            <div class="attendu">Attendu : int</div>
+            <input type="number" id="nombre_employee_sous_responsabilite" required>
+        </div>
+
+        <div class="form-group">
             <label>Distance domicile-travail</label>
             <div class="attendu">Attendu : int (en km)</div>
             <input type="number" id="distance_domicile_travail" required>
@@ -188,9 +238,41 @@ def accueil():
         </div>
 
         <div class="form-group">
+            <label>Ayant des enfants</label>
+            <div class="attendu">Attendu : str (Y)</div>
+            <input type="text" id="ayant_enfants" required>
+        </div>
+
+        <div class="form-group">
+            <label>Fréquence de déplacement</label>
+            <div class="attendu">
+                Attendu : str (Aucun, Occasionnel, Frequent)
+            </div>
+            <input type="text" id="frequence_deplacement" required>
+        </div>
+
+        <div class="form-group">
             <label>Années depuis la dernière promotion</label>
             <div class="attendu">Attendu : int</div>
             <input type="number" id="annees_depuis_la_derniere_promotion" required>
+        </div>
+
+        <div class="form-group">
+            <label>Années sous le responsable actuel</label>
+            <div class="attendu">Attendu : int</div>
+            <input type="number" id="annes_sous_responsable_actuel" required>
+        </div>
+
+        <div class="form-group">
+            <label>Fréquence de changement d'emploi</label>
+            <div class="attendu">Attendu : float</div>
+            <input type="number" step="any" id="Frequence_changement_emploi" required>
+        </div>
+
+        <div class="form-group">
+            <label>Satisfaction totale</label>
+            <div class="attendu">Attendu : float</div>
+            <input type="number" step="any" id="Satisfaction_totale" required>
         </div>
 
         <button type="submit">PRÉDIRE</button>
@@ -207,71 +289,163 @@ def accueil():
                 event.preventDefault();
 
                 const data = {
-                    age: Number(document.getElementById("age").value),
-                    genre: document.getElementById("genre").value,
+                    age: Number(
+                        document.getElementById("age").value
+                    ),
+
+                    genre:
+                        document.getElementById("genre").value,
+
                     revenu_mensuel: Number(
                         document.getElementById("revenu_mensuel").value
                     ),
+
                     statut_marital:
                         document.getElementById("statut_marital").value,
+
+                    departement:
+                        document.getElementById("departement").value,
+
                     poste:
                         document.getElementById("poste").value,
+
                     nombre_experiences_precedentes: Number(
                         document.getElementById(
                             "nombre_experiences_precedentes"
                         ).value
                     ),
+
+                    nombre_heures_travailless: Number(
+                        document.getElementById(
+                            "nombre_heures_travailless"
+                        ).value
+                    ),
+
                     annees_dans_l_entreprise: Number(
                         document.getElementById(
                             "annees_dans_l_entreprise"
                         ).value
                     ),
+
+                    annees_dans_le_poste_actuel: Number(
+                        document.getElementById(
+                            "annees_dans_le_poste_actuel"
+                        ).value
+                    ),
+
                     satisfaction_employee_environnement: Number(
                         document.getElementById(
                             "satisfaction_employee_environnement"
                         ).value
                     ),
+
+                    satisfaction_employee_nature_travail: Number(
+                        document.getElementById(
+                            "satisfaction_employee_nature_travail"
+                        ).value
+                    ),
+
                     satisfaction_employee_equipe: Number(
                         document.getElementById(
                             "satisfaction_employee_equipe"
                         ).value
                     ),
+
+                    satisfaction_employee_equilibre_pro_perso: Number(
+                        document.getElementById(
+                            "satisfaction_employee_equilibre_pro_perso"
+                        ).value
+                    ),
+
+                    note_evaluation_precedente: Number(
+                        document.getElementById(
+                            "note_evaluation_precedente"
+                        ).value
+                    ),
+
+                    note_evaluation_actuelle: Number(
+                        document.getElementById(
+                            "note_evaluation_actuelle"
+                        ).value
+                    ),
+
                     heure_supplementaires:
                         document.getElementById(
                             "heure_supplementaires"
                         ).value,
+
                     augementation_salaire_precedente: Number(
                         document.getElementById(
                             "augementation_salaire_precedente"
                         ).value
                     ),
+
                     nombre_participation_pee: Number(
                         document.getElementById(
                             "nombre_participation_pee"
                         ).value
                     ),
+
                     nb_formations_suivies: Number(
                         document.getElementById(
                             "nb_formations_suivies"
                         ).value
                     ),
+
+                    nombre_employee_sous_responsabilite: Number(
+                        document.getElementById(
+                            "nombre_employee_sous_responsabilite"
+                        ).value
+                    ),
+
                     distance_domicile_travail: Number(
                         document.getElementById(
                             "distance_domicile_travail"
                         ).value
                     ),
+
                     niveau_education: Number(
                         document.getElementById(
                             "niveau_education"
                         ).value
                     ),
+
                     domaine_etude:
                         document.getElementById(
                             "domaine_etude"
                         ).value,
+
+                    ayant_enfants:
+                        document.getElementById(
+                            "ayant_enfants"
+                        ).value,
+
+                    frequence_deplacement:
+                        document.getElementById(
+                            "frequence_deplacement"
+                        ).value,
+
                     annees_depuis_la_derniere_promotion: Number(
                         document.getElementById(
                             "annees_depuis_la_derniere_promotion"
+                        ).value
+                    ),
+
+                    annes_sous_responsable_actuel: Number(
+                        document.getElementById(
+                            "annes_sous_responsable_actuel"
+                        ).value
+                    ),
+
+                    Frequence_changement_emploi: Number(
+                        document.getElementById(
+                            "Frequence_changement_emploi"
+                        ).value
+                    ),
+
+                    Satisfaction_totale: Number(
+                        document.getElementById(
+                            "Satisfaction_totale"
                         ).value
                     )
                 };
