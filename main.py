@@ -62,6 +62,16 @@ class Features(BaseModel):
 
 model_trained = joblib.load("model_trained")
 LE_HeureSup = joblib.load("LE_HeureSup")
+EmployesBDD = joblib.load("EmployesBDD")
+
+engine = create_engine(URLBDD)
+
+EmployesBDD.to_sql(
+    "employes",
+    con=engine,
+    if_exists="replace",
+    index=False
+)
 
 @app.get("/", response_class=HTMLResponse)
 def home():
@@ -75,10 +85,9 @@ def PredictionUser(features:Features):
     features = features.model_dump()
     df_features = pd.DataFrame([features])
 
-    engine = create_engine(URLBDD)
 
     df_features.to_sql(
-        "Project5_Features",
+        "predictions_inputs",
         con=engine,
         if_exists="append",
         index=False
@@ -101,6 +110,13 @@ def PredictionUser(features:Features):
     dico_database["STAY"] = stay
     dico_database["LEAVE"] = leave
     print(dico_database)
+    df_database = pd.DataFrame([dico_database])
+    df_database.to_sql(
+        "predictions_outputs",
+        con=engine,
+        if_exists="append",
+        index=False
+    )
 
     return dico, dico_database
 

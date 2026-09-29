@@ -44,12 +44,12 @@ def test_prediction():
     assert isinstance(features, Features)
     assert 18 <= features.age <= 70
     assert 1000 <= features.revenu_mensuel <= 20000
-    dico, dico_database = PredictionUser(features)
-    assert dico is not None
-    assert dico_database['prediction'] in ['STAY', 'LEAVE']
-
-def test_CLient():
     Client = TestClient(app)
     features_test = features.model_dump()
     request = Client.post("/PredictionUser",json=features_test)
     assert request.status_code == 200
+    request = request.json()
+    dico = request[0]
+    dico_database = request[1]
+    assert dico is not None
+    assert dico_database['prediction'] in ['STAY', 'LEAVE']
