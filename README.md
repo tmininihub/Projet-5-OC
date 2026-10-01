@@ -1,32 +1,32 @@
-# Projet 5 - Déploiement d'un modèle de Machine Learning (Futurisys)
+# Projet 5 - Prédire le départ d'un employé (Futurisys)
 
-API FastAPI qui expose le modèle du projet 4 : à partir des caractéristiques d'un employé, il prédit s'il va **rester (`STAY`) ou quitter (`LEAVE`)** l'entreprise. Chaque requête et chaque prédiction sont enregistrées dans une base PostgreSQL.
+## C'est quoi ce projet ?
+
+Une entreprise veut savoir quels employés risquent de la quitter. Ce projet met à disposition un **modèle de Machine Learning** (entraîné au projet 4) sous la forme d'une **API** : un petit service web auquel on envoie l'identifiant d'un employé et qui répond **`STAY`** (il reste) ou **`LEAVE`** (il part), avec une probabilité.
 
 Dépôt : https://github.com/tmininihub/Projet-5-OC
 
-## Fonctionnement
+## Comment ça marche
 
-```
-Client ──► API FastAPI ──► Modèle (pipeline scikit-learn + LightGBM)
-               └──► PostgreSQL (inputs et outputs enregistrés)
-```
-
-Fichiers principaux : `main.py` (API), `model_trained` (pipeline entraîné, chargé avec `joblib`), `create_db.sql` (création des tables), `requirements.txt`, `.github/workflows/CICD.yml` (pipeline), fichiers `test_*.py` (tests).
+1. L'utilisateur saisit l'identifiant d'un employé sur une page web.
+2. L'API retrouve les informations de cet employé dans une base de données PostgreSQL.
+3. Le modèle calcule la prédiction à partir de ces informations.
+4. La prédiction s'affiche, et la requête avec son résultat est enregistrée dans la base.
 
 ## Installation
 
-Prérequis : Python 3.11+, PostgreSQL, Git.
+Il faut Python 3.11 ou plus, PostgreSQL et Git.
 
 ```bash
 git clone https://github.com/tmininihub/Projet-5-OC.git
 cd Projet-5-OC
-python -m venv .venv          # puis l'activer
+python -m venv .venv          # puis activer cet environnement
 pip install -r requirements.txt
 ```
 
-## Configuration
+**Créer la base** : créer une base vide dans PostgreSQL (par exemple avec pgAdmin), puis y exécuter le fichier `create_db.sql`, qui crée les tables.
 
-L'URL de la base est lue dans la variable d'environnement `URLBDD`. En local, crée un fichier `.env` à la racine (à ne pas commiter) :
+**Indiquer où se trouve la base** : créer un fichier `.env` à la racine du projet avec l'adresse de la base :
 
 ```dotenv
 URLBDD=postgresql+psycopg://utilisateur:motdepasse@localhost:5432/nom_de_la_base
@@ -38,73 +38,67 @@ URLBDD=postgresql+psycopg://utilisateur:motdepasse@localhost:5432/nom_de_la_base
 uvicorn main:app --reload
 ```
 
-| Méthode | Route | Description |
-|---|---|---|
-| GET | `/` | Vérifie que l'API répond |
-| POST | `/PredictionUser` | Reçoit un employé en JSON, renvoie la prédiction |
-| GET | `/docs` | Documentation Swagger (schéma des données et exemples d'appel) |
+Ouvrir ensuite http://127.0.0.1:8000, saisir un identifiant d'employé et cliquer sur **PRÉDIRE**.
 
-Le JSON d'entrée est validé par Pydantic (classe `Features`, 30 champs : profil, poste, satisfaction, évaluations, etc.). Une donnée manquante ou hors des valeurs autorisées renvoie une erreur 422. Le détail des champs est dans `/docs`.
+La documentation interactive de l'API (routes, exemples d'appel) est sur http://127.0.0.1:8000/docs.
 
-Les noms de champs sont ceux de l'entraînement du modèle, fautes comprises (`augementation_salaire_precedente`, `annes_sous_responsable_actuel`, `Entrepreunariat`) : ne pas les corriger sans réentraîner.
+## Le modèle
 
-Exemple de sortie enregistrée en base :
+Le modèle classe chaque employé en `STAY` ou `LEAVE`. Il a été entraîné sur les données de 1470 employés (profil, poste, satisfaction, évaluations, etc.).
 
-```python
-{'prediction': 'STAY', 'STAY': '92.8%', 'LEAVE': '7.2%'}
-```
-
-## Modèle
-
-- Classification binaire sur `a_quitte_l_entreprise`.
-- Pipeline scikit-learn (prétraitement `ColumnTransformer` + LightGBM) qui reçoit les données brutes et sauvegardé avec `joblib` **après** l'entraînement (`joblib.dump(pipeline, "model_trained")`), sinon l'API lève `NotFittedError`.
-- Données : 3 CSV (SIRH, évaluations, sondage) fusionnés sur l'identifiant employé, soit 1470 employés.
-
-### Performances
-
-Classe `OUI` = l'employé quitte l'entreprise.
-
-| Jeu | Accuracy | Précision (OUI) | Recall (OUI) | F1 (OUI) |
+| | Accuracy | Précision (OUI) | Recall (OUI) | F1 (OUI) |
 |---|---|---|---|---|
-| Train (1176) | 0.93 | 0.71 | 1.00 | 0.83 |
-| Test (294) | 0.76 | 0.35 | 0.60 | 0.44 |
+| Entraînement | 0.93 | 0.71 | 1.00 | 0.83 |
+| Test | 0.76 | 0.35 | 0.60 | 0.44 |
 
-Matrice de confusion sur le jeu de test :
+« OUI » = l'employé quitte l'entreprise. Matrice de confusion sur le jeu de test :
 
 | | Prédit NON | Prédit OUI |
 |---|---|---|
 | Réel NON | 195 | 52 |
 | Réel OUI | 19 | 28 |
 
-## Base de données
+## La base de données
 
-Exécuter `create_db.sql` dans une base PostgreSQL existante (par exemple via le Query Tool de pgAdmin) crée trois tables :
+Trois tables, créées par `create_db.sql` :
 
-| Table | Contenu |
-|---|---|
-| `employes` | Dataset complet (fusion des 3 CSV) |
-| `predictions_inputs` | Une ligne par requête : les caractéristiques envoyées au modèle |
-| `predictions_outputs` | Une ligne par prédiction : `prediction`, `"STAY"`, `"LEAVE"` |
+- `employes` : les données de chaque employé.
+- `predictions_inputs` : les données envoyées au modèle à chaque requête.
+- `predictions_outputs` : les prédictions rendues par le modèle.
 
-## Tests
+Les deux dernières gardent une trace de toutes les utilisations de l'API.
+
+## Les tests
+
+Les tests vérifient automatiquement que l'API et la validation des données fonctionnent. Pour les lancer :
 
 ```bash
-pytest
-pytest --cov=. --cov-report=term-missing   # avec couverture (pip install pytest-cov)
+pytest --cov=main --cov-report=term-missing
 ```
 
-Les tests appellent la route `/PredictionUser` avec le `TestClient` de FastAPI et utilisent la base définie par `URLBDD`.
+Le rapport indique le pourcentage du code couvert par les tests (actuellement 97 %).
 
-## CI/CD
+## Déploiement automatique (CI/CD)
 
-À chaque `push`, le pipeline GitHub Actions lance le job `test` (installation des dépendances, `pytest`). Si les tests passent, le job `deploy` lance l'API avec uvicorn (port 8000).
+À chaque `git push`, GitHub lance automatiquement deux étapes, définies dans `.github/workflows/CICD.yml` :
 
-Les jobs tournent sur un **runner auto-hébergé** (ton PC), le déploiement est donc local, ce que la mission accepte. Le secret GitHub `URLBDD` (Settings → Secrets and variables → Actions) fournit l'URL de la base.
+1. **Test** : le code est testé.
+2. **Déploiement** : si les tests réussissent, l'API est démarrée sur l'ordinateur local.
 
-Pour installer le runner : Settings → Actions → Runners → New self-hosted runner, suivre les commandes affichées, puis lancer `./run.cmd` et laisser la fenêtre ouverte. Sans runner actif, les jobs restent en attente.
+Pour que GitHub puisse exécuter ces étapes sur ton ordinateur, il faut y lancer un petit programme appelé **runner**.
+
+**Installation du runner (une seule fois)** : sur GitHub, aller dans **Settings → Actions → Runners → New self-hosted runner**, choisir Windows et exécuter dans PowerShell les commandes affichées.
+
+**Lancement du runner (à chaque session)** : dans un terminal où l'environnement Python du projet est activé :
+
+```
+cd C:\actions-runner
+run.cmd
+```
+
+Laisser la fenêtre ouverte. Si le runner est éteint, GitHub reste en attente (« Waiting for a runner ») et rien ne démarre.
 
 ## Sécurité
 
-- Le mot de passe de la base n'est jamais dans le code : fichier `.env` (ignoré par Git) en local, secret GitHub dans le pipeline.
-- Pydantic rejette les entrées invalides avant d'appeler le modèle ou la base.
-- Authentification : les clés sont stockées dans les secrets GitHub (Settings → Secrets and variables → Actions).
+- Le mot de passe de la base n'est jamais écrit dans le code : il est dans le fichier `.env` (non envoyé sur GitHub) en local, et dans les secrets GitHub (Settings → Secrets and variables → Actions) pour le déploiement automatique.
+- Les données reçues par l'API sont vérifiées avant d'être utilisées.
