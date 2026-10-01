@@ -34,6 +34,14 @@ EmployesBDD = joblib.load("EmployesBDD")
 
 engine = create_engine(URLBDD)
 
+EmployesBDD.to_sql(
+    "employes",
+    con=engine,
+    if_exists="replace",
+    index=False
+)
+
+
 @app.get("/", response_class=HTMLResponse)
 def home():
     return accueil()
@@ -51,6 +59,7 @@ def PredictionUser(id_employee):
         row = result.fetchone()
     df_features = pd.DataFrame([row])
     df_features = df_features.drop(columns=["id_employee","niveau_hierarchique_poste","annee_experience_totale","annees_dans_l_entreprise"])
+    print(df_features)
     row = df_features
 
     df_features.to_sql(
@@ -60,7 +69,6 @@ def PredictionUser(id_employee):
         index=False
     )
     df_features["heure_supplementaires"] = LE_HeureSup.transform(df_features["heure_supplementaires"])
-    prediction = model_trained.predict(df_features)
     prediction_proba = model_trained.predict_proba(df_features)
     proba = prediction_proba*100
     stay = f"{proba[0][0]:.1f}%"
@@ -82,7 +90,7 @@ def PredictionUser(id_employee):
         index=False
     )
 
-    return row.to_dict(orient="records"), dico_database
+    return dico_database, row.to_dict(orient="records")
 
 
 # features = {
