@@ -28,63 +28,30 @@ URLBDD = os.getenv("URLBDD")
 app = FastAPI()
 LE = LabelEncoder()
 
-class Features(BaseModel):
-    age: int
-    genre: Literal['F', 'M']
-    revenu_mensuel: int
-    statut_marital: Literal['Célibataire', 'Marié(e)', 'Divorcé(e)']
-    departement: Literal['Commercial', 'Consulting', 'Ressources Humaines']
-    poste: Literal['Cadre Commercial', 'Assistant de Direction', 'Consultant', 'Tech Lead', 'Manager', 'Senior Manager', 'Représentant Commercial', 'Directeur Technique', 'Ressources Humaines']
-    nombre_experiences_precedentes: int
-    nombre_heures_travailless: int
-    annees_dans_l_entreprise: int
-    annees_dans_le_poste_actuel: int
-    satisfaction_employee_environnement: int
-    satisfaction_employee_nature_travail: int
-    satisfaction_employee_equipe: int
-    satisfaction_employee_equilibre_pro_perso: int
-    note_evaluation_precedente: int
-    note_evaluation_actuelle: int
-    heure_supplementaires: Literal['Oui', 'Non']
-    augementation_salaire_precedente: int
-    nombre_participation_pee: int
-    nb_formations_suivies: int
-    nombre_employee_sous_responsabilite: int
-    distance_domicile_travail: int
-    niveau_education: int
-    domaine_etude: Literal['Infra & Cloud', 'Autre', 'Transformation Digitale', 'Marketing', 'Entrepreunariat', 'Ressources Humaines']
-    ayant_enfants: Literal['Y']
-    frequence_deplacement: Literal['Aucun', 'Occasionnel', 'Frequent']
-    annees_depuis_la_derniere_promotion: int
-    annes_sous_responsable_actuel: int
-    Frequence_changement_emploi: float
-    Satisfaction_totale: float
-
 model_trained = joblib.load("model_trained")
 LE_HeureSup = joblib.load("LE_HeureSup")
 EmployesBDD = joblib.load("EmployesBDD")
 
 engine = create_engine(URLBDD)
 
-EmployesBDD.to_sql(
-    "employes",
-    con=engine,
-    if_exists="replace",
-    index=False
-)
-
 @app.get("/", response_class=HTMLResponse)
 def home():
     return accueil()
 
 @app.post("/PredictionUser")
-def PredictionUser(features:Features):
+def PredictionUser(id_employee):
     dico = {}
     dico_database = {}
 
-    features = features.model_dump()
-    df_features = pd.DataFrame([features])
-
+    with engine.connect() as conn:
+        result = conn.execute(
+            text('SELECT * FROM "employes" WHERE id_employee = :id'),
+            {"id": id_employee}
+        )
+        row = result.fetchone()
+    df_features = pd.DataFrame([row])
+    df_features = df_features.drop(columns=["id_employee","niveau_hierarchique_poste","annee_experience_totale","annees_dans_l_entreprise"])
+    row = df_features
 
     df_features.to_sql(
         "predictions_inputs",
@@ -96,8 +63,6 @@ def PredictionUser(features:Features):
     prediction = model_trained.predict(df_features)
     prediction_proba = model_trained.predict_proba(df_features)
     proba = prediction_proba*100
-    print(proba)
-    print(prediction)
     stay = f"{proba[0][0]:.1f}%"
     leave = f"{proba[0][1]:.1f}%"
     dico["STAY"] = stay
@@ -109,7 +74,6 @@ def PredictionUser(features:Features):
 
     dico_database["STAY"] = stay
     dico_database["LEAVE"] = leave
-    print(dico_database)
     df_database = pd.DataFrame([dico_database])
     df_database.to_sql(
         "predictions_outputs",
@@ -118,7 +82,8 @@ def PredictionUser(features:Features):
         index=False
     )
 
-    return dico, dico_database
+    return row.to_dict(orient="records"), dico_database
+
 
 # features = {
 #   "age": 41,
@@ -153,4 +118,3 @@ def PredictionUser(features:Features):
 #   "Frequence_changement_emploi": 0.5
 # }
 
-# PredictionUser(Features(**features))

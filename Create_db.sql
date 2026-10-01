@@ -7,7 +7,7 @@
 -- CREATE DATABASE projet_5_bdd;
 
 -- ============================================================
--- Table du dataset complet (fusion des 3 CSV : SIRH, éval, sondage)
+-- Table du dataset (features des employés + identifiant)
 -- ============================================================
 CREATE TABLE employes (
     id_employee                                INTEGER PRIMARY KEY,
@@ -28,22 +28,21 @@ CREATE TABLE employes (
     satisfaction_employee_nature_travail       INTEGER NOT NULL,
     satisfaction_employee_equipe               INTEGER NOT NULL,
     satisfaction_employee_equilibre_pro_perso  INTEGER NOT NULL,
-    eval_number                                INTEGER NOT NULL,
     note_evaluation_actuelle                   INTEGER NOT NULL,
     heure_supplementaires                      VARCHAR(3) NOT NULL CHECK (heure_supplementaires IN ('Oui', 'Non')),
-    augementation_salaire_precedente           VARCHAR(10) NOT NULL,
-    a_quitte_l_entreprise                      VARCHAR(3) NOT NULL CHECK (a_quitte_l_entreprise IN ('Oui', 'Non')),
+    augementation_salaire_precedente           INTEGER NOT NULL,
     nombre_participation_pee                   INTEGER NOT NULL,
     nb_formations_suivies                      INTEGER NOT NULL,
     nombre_employee_sous_responsabilite        INTEGER NOT NULL,
-    code_sondage                               INTEGER NOT NULL,
     distance_domicile_travail                  INTEGER NOT NULL,
     niveau_education                           INTEGER NOT NULL,
     domaine_etude                              VARCHAR(40) NOT NULL,
     ayant_enfants                              VARCHAR(1) NOT NULL,
     frequence_deplacement                      VARCHAR(20) NOT NULL,
     annees_depuis_la_derniere_promotion        INTEGER NOT NULL,
-    annes_sous_responsable_actuel              INTEGER NOT NULL
+    annes_sous_responsable_actuel              INTEGER NOT NULL,
+    "Satisfaction_totale"                      DOUBLE PRECISION NOT NULL,
+    "Frequence_changement_emploi"              DOUBLE PRECISION NOT NULL
 );
 
 -- ============================================================
@@ -60,7 +59,6 @@ CREATE TABLE predictions_inputs (
     poste                                      VARCHAR(40) NOT NULL,
     nombre_experiences_precedentes             INTEGER NOT NULL,
     nombre_heures_travailless                  INTEGER NOT NULL,
-    annees_dans_l_entreprise                   INTEGER NOT NULL,
     annees_dans_le_poste_actuel                INTEGER NOT NULL,
     satisfaction_employee_environnement        INTEGER NOT NULL,
     satisfaction_employee_nature_travail       INTEGER NOT NULL,

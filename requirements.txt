@@ -12,3 +12,4 @@ httpx
 psycopg[binary]
 lightgbm
 psycopg2-binary
+pytest-cov
