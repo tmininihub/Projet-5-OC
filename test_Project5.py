@@ -25,8 +25,8 @@ def test_prediction():
     request = Client.post("/PredictionUser",params={"id_employee": "1"})
     assert request.status_code == 200
     request = request.json()
-    row = request[0]
-    dico_database = request[1]
+    row = request[1]
+    dico_database = request[0]
     assert 18 <= row[0]["age"] <= 70
     assert 1000 <= row[0]["revenu_mensuel"] <= 20000
     assert row[0]["genre"] in ["F", "M"]
