@@ -103,6 +103,7 @@ def accueil():
                 const id = document.getElementById("id_employee").value;
                 const resultat = document.getElementById("resultat");
 
+                resultat.style.color = "";
                 resultat.textContent = "Prédiction en cours...";
 
                 try {
@@ -111,6 +112,12 @@ def accueil():
                         "/PredictionUser?id_employee=" + encodeURIComponent(id),
                         { method: "POST" }
                     );
+
+                    if (response.status === 404 || response.status === 500) {
+                        throw new Error(
+                            "Employé introuvable : cet identifiant n'existe pas dans la base."
+                        );
+                    }
 
                     if (!response.ok) {
                         let detail = "";
@@ -136,8 +143,8 @@ def accueil():
 
                 } catch (error) {
 
-                    resultat.textContent =
-                        "Une erreur est survenue : " + error.message;
+                    resultat.style.color = "#c0392b";
+                    resultat.textContent = error.message;
 
                 }
             }
