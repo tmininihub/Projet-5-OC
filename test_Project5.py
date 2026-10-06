@@ -31,6 +31,3 @@ def test_prediction():
     assert 1000 <= row[0]["revenu_mensuel"] <= 20000
     assert row[0]["genre"] in ["F", "M"]
     assert dico_database['prediction'] in ['STAY', 'LEAVE']
-
-
-test_prediction()

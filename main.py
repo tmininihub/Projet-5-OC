@@ -41,7 +41,6 @@ EmployesBDD.to_sql(
     index=False
 )
 
-
 @app.get("/", response_class=HTMLResponse)
 def home():
     return accueil()
