@@ -98,7 +98,12 @@ run.cmd
 
 Laisser la fenêtre ouverte. Si le runner est éteint, GitHub reste en attente (« Waiting for a runner ») et rien ne démarre.
 
-## Sécurité
+**Arrêter le déploiement** : l'étape de déploiement démarre l'API et reste active tant qu'elle tourne. Pendant ce temps, l'API est utilisable sur http://127.0.0.1:8000. Si on ne l'arrête pas, GitHub coupe l'étape au bout de 12 heures et le déploiement apparaît en échec.
 
-- Le mot de passe de la base n'est jamais écrit dans le code : il est dans le fichier `.env` (non envoyé sur GitHub) en local, et dans les secrets GitHub (Settings → Secrets and variables → Actions) pour le déploiement automatique.
-- Les données reçues par l'API sont vérifiées avant d'être utilisées.
+Pour l'arrêter proprement et valider le déploiement (il passe au vert dans l'onglet **Actions**), taper dans un terminal PowerShell :
+
+```powershell
+Get-NetTCPConnection -LocalPort 8000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+```
+
+Cette commande arrête le processus qui écoute sur le port 8000, c'est-à-dire l'API. L'étape se termine alors avec succès.
