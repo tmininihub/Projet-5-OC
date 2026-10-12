@@ -93,7 +93,7 @@ Pour que GitHub puisse exécuter ces étapes sur ton ordinateur, il faut y lance
 
 ```
 cd C:\actions-runner
-run.cmd
+.\run.cmd
 ```
 
 Laisser la fenêtre ouverte. Si le runner est éteint, GitHub reste en attente (« Waiting for a runner ») et rien ne démarre.
