@@ -34,13 +34,6 @@ EmployesBDD = joblib.load("EmployesBDD")
 
 engine = create_engine(URLBDD)
 
-EmployesBDD.to_sql(
-    "employes",
-    con=engine,
-    if_exists="replace",
-    index=False
-)
-
 @app.get("/", response_class=HTMLResponse)
 def home():
     return accueil()
@@ -58,7 +51,6 @@ def PredictionUser(id_employee):
         row = result.fetchone()
     df_features = pd.DataFrame([row])
     df_features = df_features.drop(columns=["id_employee","niveau_hierarchique_poste","annee_experience_totale","annees_dans_l_entreprise"])
-    print(df_features)
     row = df_features
 
     df_features.to_sql(
